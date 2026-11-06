@@ -22,3 +22,6 @@ logs/
 # Playwright generated output
 playwright-report/
 test-results/
+
+# Agents skills
+.agents/skills/*
