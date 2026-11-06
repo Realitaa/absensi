@@ -1,0 +1,24 @@
+# Nuxt dev/build outputs (also in .gitignore)
+.nuxt/
+.output/
+.data/
+.nitro/
+.cache/
+dist/
+
+# Dependencies and generated files
+node_modules/
+pnpm-lock.yaml
+
+# Logs
+logs/
+*.log
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+# Playwright generated output
+playwright-report/
+test-results/
