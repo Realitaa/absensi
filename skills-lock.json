@@ -7,11 +7,41 @@
       "skillPath": "skills/cloudflare/SKILL.md",
       "computedHash": "e7c26bb690042060d60fcccf3e5807d000c9c064f732b6fcfccb8bbcdc5dc04a"
     },
+    "frameworks-on-cloudflare": {
+      "source": "cloudflare/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frameworks-on-cloudflare/SKILL.md",
+      "computedHash": "209eb36b1822641c17e5cd90b3e86367c4b3ae375fec356700a0aabbd7d4dff5"
+    },
+    "nuxt": {
+      "source": "onmax/nuxt-skills",
+      "sourceType": "github",
+      "skillPath": "skills/nuxt/SKILL.md",
+      "computedHash": "4cc06ac66d54c867a3b54b4034bc832437ab6aab1ababf168dac095aff8c2329"
+    },
+    "vue": {
+      "source": "onmax/nuxt-skills",
+      "sourceType": "github",
+      "skillPath": "skills/vue/SKILL.md",
+      "computedHash": "3eb31e0cd67dec2f377db271ac9163dd50e0eeca13924193a4db717d5ac4d71c"
+    },
+    "vueuse-functions": {
+      "source": "vueuse/skills",
+      "sourceType": "github",
+      "skillPath": "skills/vueuse-functions/SKILL.md",
+      "computedHash": "70b65fb127323568380de490290eaf195b165da23c1f4fa27df10b386ca0dab2"
+    },
     "workers-best-practices": {
       "source": "cloudflare/skills",
       "sourceType": "github",
       "skillPath": "skills/workers-best-practices/SKILL.md",
       "computedHash": "b6252e1aa7c41d1fbec7f064684deb9bd79866c2b6f3e18deee6d7a0c673f3f3"
+    },
+    "workers-development": {
+      "source": "cloudflare/skills",
+      "sourceType": "github",
+      "skillPath": "skills/workers-development/SKILL.md",
+      "computedHash": "0d94d2a55e633cd0d47525178dc5e63660e1a20de73b065863e48ce84c9c5bf0"
     },
     "wrangler": {
       "source": "cloudflare/skills",
