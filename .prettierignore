@@ -25,3 +25,6 @@ test-results/
 
 # Agents skills
 .agents/skills/*
+
+worker-configuration.d.ts
+nitro.d.ts

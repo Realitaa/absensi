@@ -57,6 +57,34 @@ Locally preview production build:
 pnpm preview
 ```
 
+## Quality Checks
+
+Run type checking before linting and formatting:
+
+```bash
+pnpm typecheck
+pnpm check
+```
+
+`pnpm check` runs `pnpm typecheck && pnpm lint && pnpm format:check` in that order.
+
+## Database
+
+This project uses Drizzle ORM with Cloudflare D1.
+
+```bash
+pnpm db:generate
+pnpm db:migrate
+pnpm db:seed
+pnpm db:studio
+```
+
+- `db:generate` generate a new migration from schema changes
+- `db:migrate` apply migrations to the local D1 database
+- `db:migrate:remote` apply migrations to the remote D1 database
+- `db:seed` seed the local D1 database
+- `db:studio` open Drizzle Studio
+
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
 
 ## Renovate integration

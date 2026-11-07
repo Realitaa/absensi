@@ -11,12 +11,18 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:unit": "vitest --project unit",
     "test:nuxt": "vitest --project nuxt",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "wrangler d1 migrations apply DB --local",
+    "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
+    "db:seed": "node scripts/seed.mjs",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.147",
@@ -24,6 +30,7 @@
     "@nuxt/test-utils": "4.3.4",
     "@nuxt/ui": "^4.12.0",
     "@vueuse/nuxt": "15.0.0",
+    "drizzle-orm": "^0.45.4",
     "nuxt": "^4.6.3",
     "nuxt-auth-utils": "0.6.1",
     "tailwindcss": "^4.3.3",
@@ -31,9 +38,12 @@
     "wrangler": "^4.157.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.6.0",
     "@nuxt/eslint": "^1.17.0",
     "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.6",
     "@vue/test-utils": "^2.5.1",
+    "drizzle-kit": "^0.31.11",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-better-tailwindcss": "^4.10.0",
@@ -42,6 +52,7 @@
     "playwright-core": "^1.64.1",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "vitest": "^5.1.0",
     "vue-tsc": "^3.3.13"
