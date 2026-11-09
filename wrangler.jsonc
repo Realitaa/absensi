@@ -16,5 +16,12 @@
       "database_id": "25f3a683-c151-4d52-a297-1e2a4e02cd68",
       "migrations_dir": "drizzle"
     }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "PHOTOS",
+      "bucket_name": "absensi-selfies",
+      "preview_bucket_name": "absensi-selfies-preview"
+    }
   ]
 }

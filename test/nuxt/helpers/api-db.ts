@@ -70,6 +70,101 @@ async function getD1(): Promise<AnyD1Database> {
   return opened.d1
 }
 
+/** Real R2 buckets for injection into `event.context.cloudflare.env`. */
+export async function createApiBuckets() {
+  dbPromise ??= openDb()
+  const opened = (await dbPromise) as unknown as {
+    proxy: { env: Record<string, unknown> }
+  }
+  const env = opened.proxy.env
+  const buckets = {
+    PHOTOS: env.PHOTOS as R2Bucket | undefined,
+    DB: env.DB as AnyD1Database | undefined
+  }
+  if (!buckets.PHOTOS)
+    throw new Error('R2 binding "PHOTOS" not found in test env')
+  return buckets
+}
+
+export async function clearPhotoUploads(db: Db) {
+  const { photoUploads } =
+    await import('../../../server/db/schema/photo_uploads')
+  await db.delete(photoUploads)
+}
+
+export async function createMultipartEvent(input: {
+  path: string
+  fieldName: string
+  fileName: string
+  fileType: string
+  fileBytes: Uint8Array
+  contentTypeOverride?: string
+}) {
+  const d1 = await getD1()
+  const buckets = await createApiBuckets()
+  const boundary = `----AbsensiTestBoundary${Math.random().toString(36).slice(2)}`
+  const encoder = new TextEncoder()
+  const prefix = encoder.encode(
+    `--${boundary}\r\n` +
+      `Content-Disposition: form-data; name="${input.fieldName}"; filename="${input.fileName}"\r\n` +
+      `Content-Type: ${input.fileType}\r\n\r\n`
+  )
+  const suffix = encoder.encode(`\r\n--${boundary}--\r\n`)
+  const merged = new Uint8Array(
+    prefix.length + input.fileBytes.length + suffix.length
+  )
+  merged.set(prefix, 0)
+  merged.set(input.fileBytes, prefix.length)
+  merged.set(suffix, prefix.length + input.fileBytes.length)
+  const body = Buffer.from(merged)
+  const contentType =
+    input.contentTypeOverride ?? `multipart/form-data; boundary=${boundary}`
+  const headers: Record<string, string> = {
+    'content-type': contentType,
+    'content-length': String(body.length)
+  }
+  const req: Record<string, unknown> = {
+    method: 'POST',
+    url: input.path,
+    headers,
+    body,
+    rawBody: body
+  }
+  const res = {
+    statusCode: 200,
+    headers: new Headers(),
+    setHeader(name: string, value: string | string[]) {
+      if (value)
+        this.headers.set(
+          name,
+          (Array.isArray(value) ? value : [value]).join(', ')
+        )
+    },
+    getHeader(name: string) {
+      return this.headers.get(name) ?? undefined
+    },
+    getHeaders() {
+      return Object.fromEntries(this.headers.entries())
+    }
+  }
+  const request = new Request('http://localhost' + input.path, {
+    method: 'POST',
+    headers,
+    body: new Uint8Array(body)
+  })
+  const event: Record<string, unknown> = {
+    _method: 'POST',
+    _path: input.path,
+    path: input.path,
+    method: 'POST',
+    node: { req, res },
+    context: { cloudflare: { env: { DB: d1, PHOTOS: buckets.PHOTOS } } },
+    request,
+    web: { request }
+  }
+  return event as never
+}
+
 export async function clearUsers(db: Db) {
   await db.delete(users)
 }

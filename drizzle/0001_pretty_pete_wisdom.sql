@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `photo_uploads_photo_path_unique` ON `photo_uploads` (`photo_path`);

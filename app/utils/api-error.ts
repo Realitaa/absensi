@@ -22,6 +22,7 @@ const ErrorCodes = {
   DUPLICATE_ATTENDANCE: 'DUPLICATE_ATTENDANCE',
   INVALID_SESSION_WINDOW: 'INVALID_SESSION_WINDOW',
   GPS_UNAVAILABLE: 'GPS_UNAVAILABLE',
+  STORAGE_ERROR: 'STORAGE_ERROR',
   INTERNAL_ERROR: 'INTERNAL_ERROR'
 } as const
 
@@ -54,6 +55,7 @@ const MESSAGE_MAP: Partial<Record<ErrorCode, string>> = {
   [ErrorCodes.INVALID_SESSION_WINDOW]: 'Waktu sesi tidak valid.',
   [ErrorCodes.GPS_UNAVAILABLE]:
     'Lokasi GPS tidak tersedia. Periksa izin lokasi Anda.',
+  [ErrorCodes.STORAGE_ERROR]: 'Gagal menyimpan foto. Coba lagi nanti.',
   [ErrorCodes.INTERNAL_ERROR]: FALLBACK
 }
 

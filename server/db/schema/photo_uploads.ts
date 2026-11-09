@@ -1,4 +1,10 @@
-import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import {
+  index,
+  integer,
+  sqliteTable,
+  text,
+  uniqueIndex
+} from 'drizzle-orm/sqlite-core'
 import { attendances } from './attendances'
 import { users } from './users'
 
@@ -21,6 +27,7 @@ export const photoUploads = sqliteTable(
     })
   },
   t => [
+    uniqueIndex('photo_uploads_photo_path_unique').on(t.photoPath),
     index('photo_uploads_user_id_idx').on(t.userId),
     index('photo_uploads_status_idx').on(t.status),
     index('photo_uploads_attendance_id_idx').on(t.attendanceId),

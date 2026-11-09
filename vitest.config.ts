@@ -48,7 +48,8 @@ export default defineConfig({
             'test/nuxt/user-management.test.ts',
             'test/nuxt/rooms.test.ts',
             'test/nuxt/sessions.test.ts',
-            'test/nuxt/timezone.test.ts'
+            'test/nuxt/timezone.test.ts',
+            'test/nuxt/selfie-upload.test.ts'
           ],
           environment: 'node',
           testTimeout: 60_000,
