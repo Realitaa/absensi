@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import type { NewUser, UserRole } from '../schema/users'
+import type { NewUser, UserRole } from '../../server/db/schema/users'
 
 export function userFactory(overrides: Partial<NewUser> = {}): NewUser {
   const role: UserRole =

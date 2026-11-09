@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm'
 import type { Db } from '../index'
 import { attendances } from '../schema/attendances'
 import { attendanceCorrections } from '../schema/attendance_corrections'
-import { attendanceCorrectionFactory } from '../factories/attendance_correction.factory'
+import { attendanceCorrectionFactory } from '../../../test/factories/attendance_correction.factory'
 import { users } from '../schema/users'
 
 export async function seedAttendanceCorrections(db: Db) {

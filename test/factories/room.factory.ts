@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import type { NewRoom } from '../schema/rooms'
+import type { NewRoom } from '../../server/db/schema/rooms'
 
 export function roomFactory(overrides: Partial<NewRoom> = {}): NewRoom {
   return {

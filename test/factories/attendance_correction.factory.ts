@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
-import { attendanceStatuses } from '../schema/attendances'
-import type { NewAttendanceCorrection } from '../schema/attendance_corrections'
+import { attendanceStatuses } from '../../server/db/schema/attendances'
+import type { NewAttendanceCorrection } from '../../server/db/schema/attendance_corrections'
 
 export function attendanceCorrectionFactory(
   overrides: Partial<NewAttendanceCorrection> & {

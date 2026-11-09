@@ -1,6 +1,6 @@
 import type { Db } from '../index'
 import { sessions } from '../schema/sessions'
-import { sessionFactory } from '../factories/session.factory'
+import { sessionFactory } from '../../../test/factories/session.factory'
 
 export async function seedSessions(
   db: Db,

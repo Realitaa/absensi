@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import type { Db } from '../index'
 import { attendances } from '../schema/attendances'
-import { attendanceFactory } from '../factories/attendance.factory'
+import { attendanceFactory } from '../../../test/factories/attendance.factory'
 import { users } from '../schema/users'
 import { photoUploads } from '../schema/photo_uploads'
 

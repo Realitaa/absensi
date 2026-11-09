@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm'
 import { faker } from '@faker-js/faker'
 import type { Db } from '../index'
 import { users } from '../schema/users'
-import { hashPassword } from '../lib/password'
+import { hashPassword } from '../../lib/password'
 
 const SEEDED_USERS = [
   {

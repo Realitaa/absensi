@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import type { Db } from '../index'
 import { photoUploads } from '../schema/photo_uploads'
-import { photoUploadFactory } from '../factories/photo_upload.factory'
+import { photoUploadFactory } from '../../../test/factories/photo_upload.factory'
 import { users } from '../schema/users'
 
 export async function seedPhotoUploads(db: Db) {

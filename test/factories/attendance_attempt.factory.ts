@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker'
-import { validationPolicies } from '../schema/attendances'
+import { validationPolicies } from '../../server/db/schema/attendances'
 import {
   attemptResults,
   type NewAttendanceAttempt
-} from '../schema/attendance_attempts'
+} from '../../server/db/schema/attendance_attempts'
 
 export function attendanceAttemptFactory(
   overrides: Partial<NewAttendanceAttempt> & {

@@ -3,7 +3,7 @@ import {
   attendanceStatuses,
   validationPolicies,
   type NewAttendance
-} from '../schema/attendances'
+} from '../../server/db/schema/attendances'
 
 export function attendanceFactory(
   overrides: Partial<NewAttendance> & { studentId: number; sessionId: number }

@@ -1,0 +1,34 @@
+export const ErrorCodes = {
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
+  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  UNAUTHORIZED: 'UNAUTHORIZED',
+  FORBIDDEN: 'FORBIDDEN',
+  NOT_FOUND: 'NOT_FOUND',
+  CONFLICT: 'CONFLICT',
+  CAPTURE_EXPIRED: 'CAPTURE_EXPIRED',
+  CAPTURE_MISMATCH: 'CAPTURE_MISMATCH',
+  CAPTURE_INCOMPLETE: 'CAPTURE_INCOMPLETE',
+  SESSION_CLOSED: 'SESSION_CLOSED',
+  SESSION_NOT_OPEN: 'SESSION_NOT_OPEN',
+  OUTSIDE_GEOFENCE: 'OUTSIDE_GEOFENCE',
+  DUPLICATE_ATTENDANCE: 'DUPLICATE_ATTENDANCE',
+  INVALID_SESSION_WINDOW: 'INVALID_SESSION_WINDOW',
+  GPS_UNAVAILABLE: 'GPS_UNAVAILABLE',
+  INTERNAL_ERROR: 'INTERNAL_ERROR'
+} as const
+
+export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes]
+
+export interface ApiErrorBody {
+  error: {
+    code: ErrorCode
+    message: string
+    status: number
+    requestId: string
+    details?: Record<string, unknown>
+  }
+}
+
+export interface FieldErrors {
+  [field: string]: string[]
+}

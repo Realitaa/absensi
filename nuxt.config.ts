@@ -15,10 +15,14 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   routeRules: {
-    '/': { prerender: true }
+    '/': { redirect: { to: '/login', statusCode: 301 } }
   },
 
   compatibilityDate: '2026-06-30',
+
+  nitro: {
+      preset: 'cloudflare_module',
+  },
 
   eslint: {
     config: {

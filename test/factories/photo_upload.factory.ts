@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker'
 import {
   photoUploadStatuses,
   type NewPhotoUpload
-} from '../schema/photo_uploads'
+} from '../../server/db/schema/photo_uploads'
 
 export function photoUploadFactory(
   overrides: Partial<NewPhotoUpload> & { userId: number }

@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
-import { validationPolicies } from '../schema/attendances'
-import type { NewSystemSetting } from '../schema/system_settings'
+import { validationPolicies } from '../../server/db/schema/attendances'
+import type { NewSystemSetting } from '../../server/db/schema/system_settings'
 
 export function systemSettingFactory(
   overrides: Partial<NewSystemSetting> = {}

@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import type { NewSession } from '../schema/sessions'
+import type { NewSession } from '../../server/db/schema/sessions'
 
 export function sessionFactory(
   overrides: Partial<NewSession> & { lecturerId: number; roomId: number }
