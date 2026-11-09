@@ -64,7 +64,7 @@ export async function createApiDb(): Promise<Db> {
 }
 
 /** Real D1 binding for injection into `event.context.cloudflare.env`. */
-export async function getD1(): Promise<AnyD1Database> {
+async function getD1(): Promise<AnyD1Database> {
   dbPromise ??= openDb()
   const opened = await dbPromise
   return opened.d1
@@ -133,7 +133,10 @@ export async function createApiEvent(body: unknown, path: string) {
         setCookieHeaders.push(...(Array.isArray(value) ? value : [value]))
       }
       if (value)
-        this.headers.set(name, (Array.isArray(value) ? value : [value]).join(', '))
+        this.headers.set(
+          name,
+          (Array.isArray(value) ? value : [value]).join(', ')
+        )
     },
     getHeader(name: string) {
       return this.headers.get(name) ?? undefined

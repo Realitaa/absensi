@@ -10,6 +10,7 @@ const ErrorCodes = {
   FORBIDDEN: 'FORBIDDEN',
   NOT_FOUND: 'NOT_FOUND',
   CONFLICT: 'CONFLICT',
+  ROOM_IN_USE: 'ROOM_IN_USE',
   CAPTURE_EXPIRED: 'CAPTURE_EXPIRED',
   CAPTURE_MISMATCH: 'CAPTURE_MISMATCH',
   CAPTURE_INCOMPLETE: 'CAPTURE_INCOMPLETE',
@@ -33,6 +34,8 @@ const MESSAGE_MAP: Partial<Record<ErrorCode, string>> = {
   [ErrorCodes.FORBIDDEN]: 'Anda tidak memiliki akses ke halaman ini.',
   [ErrorCodes.NOT_FOUND]: 'Data tidak ditemukan.',
   [ErrorCodes.CONFLICT]: 'Data sudah ada atau sedang digunakan.',
+  [ErrorCodes.ROOM_IN_USE]:
+    'Ruangan tidak dapat dihapus karena masih digunakan oleh sesi absensi.',
   [ErrorCodes.CAPTURE_EXPIRED]: 'Tautan absensi sudah kedaluwarsa.',
   [ErrorCodes.CAPTURE_MISMATCH]: 'Tautan absensi tidak valid.',
   [ErrorCodes.CAPTURE_INCOMPLETE]: 'Data absensi belum lengkap.',
