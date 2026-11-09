@@ -11,6 +11,8 @@ const ErrorCodes = {
   NOT_FOUND: 'NOT_FOUND',
   CONFLICT: 'CONFLICT',
   ROOM_IN_USE: 'ROOM_IN_USE',
+  SESSION_IN_USE: 'SESSION_IN_USE',
+  SESSION_NOT_EDITABLE: 'SESSION_NOT_EDITABLE',
   CAPTURE_EXPIRED: 'CAPTURE_EXPIRED',
   CAPTURE_MISMATCH: 'CAPTURE_MISMATCH',
   CAPTURE_INCOMPLETE: 'CAPTURE_INCOMPLETE',
@@ -36,6 +38,10 @@ const MESSAGE_MAP: Partial<Record<ErrorCode, string>> = {
   [ErrorCodes.CONFLICT]: 'Data sudah ada atau sedang digunakan.',
   [ErrorCodes.ROOM_IN_USE]:
     'Ruangan tidak dapat dihapus karena masih digunakan oleh sesi absensi.',
+  [ErrorCodes.SESSION_IN_USE]:
+    'Sesi tidak dapat dihapus karena sudah memiliki catatan absensi.',
+  [ErrorCodes.SESSION_NOT_EDITABLE]:
+    'Sesi yang sudah ditutup tidak dapat diubah.',
   [ErrorCodes.CAPTURE_EXPIRED]: 'Tautan absensi sudah kedaluwarsa.',
   [ErrorCodes.CAPTURE_MISMATCH]: 'Tautan absensi tidak valid.',
   [ErrorCodes.CAPTURE_INCOMPLETE]: 'Data absensi belum lengkap.',

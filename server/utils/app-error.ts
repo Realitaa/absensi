@@ -1,3 +1,4 @@
+import { defineEventHandler, setResponseStatus, type H3Event } from 'h3'
 import {
   ErrorCodes,
   type ErrorCode,
@@ -99,4 +100,46 @@ export function getRequestId(event: {
   const existing = event.context?.requestId
   if (typeof existing === 'string' && existing) return existing
   return createRequestId()
+}
+
+/**
+ * Wrap a Nitro event handler so AppErrors reach the client as the
+ * shared `{ error: { code, message, status, requestId, details? } }`
+ * envelope with matching HTTP status.
+ *
+ * Why this exists (Nuxt 4 / Nitro v2): `server/error.ts` is NOT
+ * auto-discovered — Nitro only scans `server/api` + `server/routes`,
+ * and `@nuxt/nitro-server` sets `nitro.errorHandler` to its own SSR
+ * page-error handler (`runtime/handlers/error`), which short-circuits
+ * `/api/**` JSON requests via `defaultHandler`. A plain `AppError`
+ * thrown from a route is therefore wrapped by h3 into an H3Error
+ * (`status` -> `statusCode`, no `data`), and the response body
+ * becomes `{ error: true, statusCode, statusMessage, message, stack }`
+ * with NO stable error `code`. The previous `server/error.ts` handler
+ * was never registered and, even if it were, its `data` would be
+ * nested one level too deep for the frontend extractor
+ * (`err.data.error.code`), which expects the envelope as the whole
+ * `$fetch` error body.
+ *
+ * This wrapper keeps every route's contract explicit: catch AppError,
+ * set the HTTP status, and return the envelope as the response body.
+ * Unexpected (non-AppError) errors are rethrown so Nitro/h3 keeps
+ * producing its default 500 and logs the stack server-side.
+ */
+export function apiHandler<Body>(
+  handler: (event: H3Event) => Promise<Body>
+): ReturnType<typeof defineEventHandler> {
+  return defineEventHandler(async (event: H3Event) => {
+    try {
+      return await handler(event)
+    } catch (error) {
+      if (error instanceof AppError) {
+        const requestId = getRequestId(event as never)
+        event.context.requestId = requestId
+        setResponseStatus(event, error.status)
+        return toErrorBody(error, requestId)
+      }
+      throw error
+    }
+  })
 }
