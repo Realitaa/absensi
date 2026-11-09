@@ -1,9 +1,10 @@
-import { defineEventHandler, readBody } from 'h3'
+import { readBody } from 'h3'
 import { requireAuth } from '../../utils/http'
 import { getDb } from '../../utils/db'
 import { changePassword } from '../../services/profile.service'
+import { apiHandler } from '../../utils/app-error'
 
-export default defineEventHandler(async event => {
+export default apiHandler(async event => {
   const actor = await requireAuth(event)
   const body =
     (await readBody<{

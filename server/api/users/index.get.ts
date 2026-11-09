@@ -1,9 +1,10 @@
-import { defineEventHandler, getQuery } from 'h3'
+import { getQuery } from 'h3'
 import { requireRole } from '../../utils/http'
 import { getDb } from '../../utils/db'
 import { listManagedUsers } from '../../services/user.service'
+import { apiHandler } from '../../utils/app-error'
 
-const RAW = defineEventHandler(async event => {
+const RAW = apiHandler(async event => {
   const actor = await requireRole(event, 'admin')
   const q = getQuery(event)
   const db = getDb(event as never)

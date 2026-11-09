@@ -13,7 +13,7 @@ import {
   type Db
 } from './helpers/api-db'
 import { hashPassword } from '../../server/lib/password'
-import { AppError, toErrorBody } from '../../server/utils/app-error'
+import type { ApiErrorBody } from '../../shared/error-codes'
 
 Object.assign(globalThis, {
   setUserSession: async (_event: unknown, data: unknown) => ({ data }),
@@ -77,39 +77,39 @@ describe('profile self-data management (FR-AUTH-04)', () => {
     sessionUserId = userId
     const event = await createApiEvent(body, '/api/auth/me')
     ;(event as unknown as Record<string, unknown>)._method = 'PATCH'
-    try {
-      const result = await (mePatchHandler as (e: unknown) => Promise<unknown>)(
-        event
-      )
-      return { statusCode: 200, body: result }
-    } catch (error) {
-      if (error instanceof AppError) {
-        return {
-          statusCode: error.status,
-          body: toErrorBody(error, 'req_test')
-        }
+    const result = await (mePatchHandler as (e: unknown) => Promise<unknown>)(
+      event
+    )
+
+    // apiHandler returns envelope as body with status on the response
+
+    if (result && typeof result === 'object' && 'error' in result) {
+      return {
+        statusCode: (result as unknown as ApiErrorBody).error.status,
+
+        body: result
       }
-      throw error
     }
+    return { statusCode: 200, body: result }
   }
 
   async function callPassword(body: unknown, userId?: number) {
     sessionUserId = userId
     const event = await createApiEvent(body, '/api/auth/password')
-    try {
-      const result = await (
-        passwordHandler as (e: unknown) => Promise<unknown>
-      )(event)
-      return { statusCode: 200, body: result }
-    } catch (error) {
-      if (error instanceof AppError) {
-        return {
-          statusCode: error.status,
-          body: toErrorBody(error, 'req_test')
-        }
+    const result = await (passwordHandler as (e: unknown) => Promise<unknown>)(
+      event
+    )
+
+    // apiHandler returns envelope as body with status on the response
+
+    if (result && typeof result === 'object' && 'error' in result) {
+      return {
+        statusCode: (result as unknown as ApiErrorBody).error.status,
+
+        body: result
       }
-      throw error
     }
+    return { statusCode: 200, body: result }
   }
 
   it('PATCH updates own name (200)', async () => {

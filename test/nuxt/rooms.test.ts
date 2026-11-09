@@ -26,7 +26,7 @@ import {
   type Db
 } from './helpers/api-db'
 import { hashPassword } from '../../server/lib/password'
-import { AppError, toErrorBody } from '../../server/utils/app-error'
+import type { ApiErrorBody } from '../../shared/error-codes'
 import { rooms } from '../../server/db/schema/rooms'
 import { sessions } from '../../server/db/schema/sessions'
 
@@ -124,19 +124,19 @@ describe('room management (FR-ROOM-01..05)', () => {
         id: match?.[1]
       }
     }
-    try {
-      const callable = handler as (event: never) => Promise<unknown>
-      const result = await callable(event as never)
-      return { statusCode: 200, body: result }
-    } catch (error) {
-      if (error instanceof AppError) {
-        return {
-          statusCode: error.status,
-          body: toErrorBody(error, 'req_test')
-        }
+    const callable = handler as (event: never) => Promise<unknown>
+    const result = await callable(event as never)
+
+    // apiHandler returns envelope as body with status on the response
+
+    if (result && typeof result === 'object' && 'error' in result) {
+      return {
+        statusCode: (result as unknown as ApiErrorBody).error.status,
+
+        body: result
       }
-      throw error
     }
+    return { statusCode: 200, body: result }
   }
 
   it('POST creates a room as admin (200)', async () => {

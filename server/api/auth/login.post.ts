@@ -1,11 +1,11 @@
-import { defineEventHandler, readBody } from 'h3'
+import { readBody } from 'h3'
 // setUserSession comes from nuxt-auth-utils via Nitro auto-import
 // (no static export from 'nuxt/server') — do NOT add an explicit import.
 import { getDb } from '../../utils/db'
 import { authenticateByIdentifier } from '../../services/auth.service'
-import { validationError } from '../../utils/app-error'
+import { apiHandler, validationError } from '../../utils/app-error'
 
-export default defineEventHandler(async event => {
+export default apiHandler(async event => {
   const body = await readBody<{
     identifier?: string
     username?: string

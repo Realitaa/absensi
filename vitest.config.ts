@@ -46,7 +46,9 @@ export default defineConfig({
             'test/nuxt/db.test.ts',
             'test/nuxt/profile.test.ts',
             'test/nuxt/user-management.test.ts',
-            'test/nuxt/rooms.test.ts'
+            'test/nuxt/rooms.test.ts',
+            'test/nuxt/sessions.test.ts',
+            'test/nuxt/timezone.test.ts'
           ],
           environment: 'node',
           testTimeout: 60_000,

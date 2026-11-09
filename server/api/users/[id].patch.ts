@@ -1,7 +1,8 @@
-import { defineEventHandler, readBody, getRouterParam } from 'h3'
+import { readBody, getRouterParam } from 'h3'
 import { requireRole } from '../../utils/http'
 import { getDb } from '../../utils/db'
 import { updateUser } from '../../services/user.service'
+import { apiHandler } from '../../utils/app-error'
 
 function paramId(event) {
   const p = getRouterParam(event, 'id') || getRouterParam(event, 'id')
@@ -14,7 +15,7 @@ function paramId(event) {
   return NaN
 }
 
-const RAW = defineEventHandler(async event => {
+const RAW = apiHandler(async event => {
   const actor = await requireRole(event, 'admin')
   const body =
     (await readBody<Record<string, unknown>>(event).catch(() => null)) ?? {}

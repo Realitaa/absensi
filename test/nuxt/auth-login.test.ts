@@ -1,11 +1,4 @@
-import {
-  describe,
-  it,
-  expect,
-  beforeEach,
-  beforeAll,
-  afterAll
-} from 'vitest'
+import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'vitest'
 import {
   clearUsers,
   closeApiDb,
@@ -15,7 +8,7 @@ import {
   type Db
 } from './helpers/api-db'
 import { hashPassword } from '../../server/lib/password'
-import { AppError, toErrorBody } from '../../server/utils/app-error'
+import type { ApiErrorBody } from '../../shared/error-codes'
 
 // Handler uses bare `setUserSession` (Nitro auto-import from
 // nuxt-auth-utils). No auto-import in vitest — inject the same
@@ -88,28 +81,20 @@ describe('auth login API (username or NIM)', () => {
 
   async function callLogin(body: unknown) {
     const event = await createApiEvent(body, '/api/auth/login')
-    try {
-      const result = await (loginHandler as (e: unknown) => Promise<unknown>)(
-        event
-      )
-      return { statusCode: 200, body: result }
-    } catch (error) {
-      if (error instanceof AppError) {
-        return {
-          statusCode: error.status,
-          body: toErrorBody(error, 'req_test123')
-        }
-      }
-      const err = error as {
-        statusCode?: number
-        message?: string
-        data?: unknown
-      }
+    const result = await (loginHandler as (e: unknown) => Promise<unknown>)(
+      event
+    )
+
+    // apiHandler returns envelope as body with status on the response
+
+    if (result && typeof result === 'object' && 'error' in result) {
       return {
-        statusCode: err.statusCode ?? 500,
-        body: { message: err.message, data: err.data }
+        statusCode: (result as unknown as ApiErrorBody).error.status,
+
+        body: result
       }
     }
+    return { statusCode: 200, body: result }
   }
 
   it('authenticates admin by username (200)', async () => {

@@ -1,7 +1,8 @@
-import { defineEventHandler, getRouterParam } from 'h3'
+import { getRouterParam } from 'h3'
 import { requireRole } from '../../utils/http'
 import { getDb } from '../../utils/db'
 import { softDeleteUser } from '../../services/user.service'
+import { apiHandler } from '../../utils/app-error'
 
 function paramId(event) {
   const p = getRouterParam(event, 'id')
@@ -13,7 +14,7 @@ function paramId(event) {
   return NaN
 }
 
-const RAW = defineEventHandler(async event => {
+const RAW = apiHandler(async event => {
   const actor = await requireRole(event, 'admin')
   const db = getDb(event as never)
   await softDeleteUser(db, actor, paramId(event))

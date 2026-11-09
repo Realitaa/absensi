@@ -13,7 +13,7 @@ import {
   type Db
 } from './helpers/api-db'
 import { hashPassword, verifyPassword } from '../../server/lib/password'
-import { AppError, toErrorBody } from '../../server/utils/app-error'
+import type { ApiErrorBody } from '../../shared/error-codes'
 import { eq } from 'drizzle-orm'
 import { users } from '../../server/db/schema/users'
 
@@ -30,15 +30,18 @@ Object.assign(globalThis, {
 async function callHandler(handler, body, userId = undefined, url = undefined) {
   sessionUserId = userId
   const event = await createApiEvent(body, url ?? '/api/users')
-  try {
-    const result = await handler(event)
-    return { statusCode: 200, body: result }
-  } catch (error) {
-    if (error instanceof AppError) {
-      return { statusCode: error.status, body: toErrorBody(error, 'req_test') }
+  const result = await handler(event)
+
+  // apiHandler returns envelope as body with status on the response
+
+  if (result && typeof result === 'object' && 'error' in result) {
+    return {
+      statusCode: (result as unknown as ApiErrorBody).error.status,
+
+      body: result
     }
-    throw error
   }
+  return { statusCode: 200, body: result }
 }
 
 const postHandler = (await import('../../server/api/users/index.post')).default

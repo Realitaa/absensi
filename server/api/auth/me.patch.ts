@@ -1,9 +1,10 @@
-import { defineEventHandler, readBody } from 'h3'
+import { readBody } from 'h3'
 import { requireAuth } from '../../utils/http'
 import { getDb } from '../../utils/db'
 import { updateOwnProfile } from '../../services/profile.service'
+import { apiHandler } from '../../utils/app-error'
 
-const RAW = defineEventHandler(async event => {
+const RAW = apiHandler(async event => {
   const actor = await requireAuth(event)
   const body =
     (await readBody<{
