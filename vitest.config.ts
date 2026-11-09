@@ -41,7 +41,11 @@ export default defineConfig({
         },
         test: {
           name: 'server',
-          include: ['test/nuxt/auth-login.test.ts'],
+          include: [
+            'test/nuxt/auth-login.test.ts',
+            'test/nuxt/db.test.ts',
+            'test/nuxt/profile.test.ts'
+          ],
           environment: 'node',
           testTimeout: 60_000,
           hookTimeout: 60_000

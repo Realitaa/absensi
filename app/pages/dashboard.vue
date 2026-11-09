@@ -1,37 +1,14 @@
 <script setup lang="ts">
-definePageMeta({ middleware: ['auth'] })
+definePageMeta({ middleware: ['auth'], layout: 'default' })
 
-const { user, clear } = useUserSession()
-const toast = useToast()
-const loading = ref(false)
-
-async function onLogout() {
-  loading.value = true
-  try {
-    await $fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
-    await clear()
-    toast.add({
-      title: 'Keluar berhasil',
-      description: 'Sesi Anda telah berakhir.',
-      color: 'success'
-    })
-    await navigateTo('/login')
-  } finally {
-    loading.value = false
-  }
-}
+const { user } = useUserSession()
 </script>
 
 <template>
-  <UMain class="mx-auto max-w-3xl px-4 py-10">
-    <div class="mb-6 flex items-start justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-semibold">Dasbor</h1>
-        <p class="text-sm text-muted">Selamat datang kembali.</p>
-      </div>
-      <UButton color="error" variant="soft" :loading="loading" @click="onLogout"
-        >Keluar</UButton
-      >
+  <div class="w-full">
+    <div class="mb-6">
+      <h1 class="text-2xl font-semibold">Dasbor</h1>
+      <p class="text-sm text-muted">Selamat datang kembali.</p>
     </div>
 
     <UCard v-if="user">
@@ -50,8 +27,8 @@ async function onLogout() {
       </div>
     </UCard>
 
-    <UCard v-else class="mt-4">
+    <UCard v-else>
       <p class="text-sm text-muted">Belum ada data pengguna.</p>
     </UCard>
-  </UMain>
+  </div>
 </template>
