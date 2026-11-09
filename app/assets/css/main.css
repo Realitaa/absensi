@@ -15,6 +15,26 @@
   --ui-radius: 0.375rem;
 }
 
+@keyframes room-coordinate-caret-jiggle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-4px);
+  }
+  50% {
+    transform: translateY(2px);
+  }
+  75% {
+    transform: translateY(-2px);
+  }
+}
+
+.room-coordinate-caret-jiggle {
+  animation: room-coordinate-caret-jiggle 0.45s ease-in-out 2;
+}
+
 :root, .light {
   --ui-bg: var(--ui-color-neutral-50);
   --ui-bg-muted: var(--ui-color-neutral-100);
