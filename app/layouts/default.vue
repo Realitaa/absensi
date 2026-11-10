@@ -34,6 +34,11 @@ const items: NavigationMenuItem[][] = [
             label: 'Ruangan',
             icon: 'i-lucide-door-open',
             to: '/rooms'
+          } as NavigationMenuItem,
+          {
+            label: 'Konfigurasi GPS',
+            icon: 'i-lucide-crosshair',
+            to: '/settings/gps'
           } as NavigationMenuItem
         ]
       : []),

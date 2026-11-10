@@ -22,6 +22,8 @@ const ErrorCodes = {
   DUPLICATE_ATTENDANCE: 'DUPLICATE_ATTENDANCE',
   INVALID_SESSION_WINDOW: 'INVALID_SESSION_WINDOW',
   GPS_UNAVAILABLE: 'GPS_UNAVAILABLE',
+  CAMERA_UNAVAILABLE: 'CAMERA_UNAVAILABLE',
+  CAPTURE_MISMATCH: 'CAPTURE_MISMATCH',
   STORAGE_ERROR: 'STORAGE_ERROR',
   INTERNAL_ERROR: 'INTERNAL_ERROR'
 } as const
@@ -55,6 +57,10 @@ const MESSAGE_MAP: Partial<Record<ErrorCode, string>> = {
   [ErrorCodes.INVALID_SESSION_WINDOW]: 'Waktu sesi tidak valid.',
   [ErrorCodes.GPS_UNAVAILABLE]:
     'Lokasi GPS tidak tersedia. Periksa izin lokasi Anda.',
+  [ErrorCodes.CAMERA_UNAVAILABLE]:
+    'Kamera tidak tersedia atau izinnya ditolak.',
+  [ErrorCodes.CAPTURE_MISMATCH]:
+    'Foto selfie tidak valid atau sudah digunakan.',
   [ErrorCodes.STORAGE_ERROR]: 'Gagal menyimpan foto. Coba lagi nanti.',
   [ErrorCodes.INTERNAL_ERROR]: FALLBACK
 }

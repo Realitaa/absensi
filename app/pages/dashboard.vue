@@ -5,7 +5,8 @@ const { user } = useUserSession()
 </script>
 
 <template>
-  <div class="w-full">
+  <StudentAttendanceWorkflow v-if="user?.role === 'student'" />
+  <div v-else class="w-full">
     <div class="mb-6">
       <h1 class="text-2xl font-semibold">Dasbor</h1>
       <p class="text-sm text-muted">Selamat datang kembali.</p>
