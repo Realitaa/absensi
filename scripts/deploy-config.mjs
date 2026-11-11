@@ -6,6 +6,7 @@ const outputPath = new URL('../wrangler.deploy.jsonc', import.meta.url)
 
 const DEPLOY_D1_DATABASE_ID = process.env.DEPLOY_D1_DATABASE_ID
 const DEPLOY_D1_DATABASE_NAME = process.env.DEPLOY_D1_DATABASE_NAME || 'absensi'
+const DEPLOY_R2_BUCKET = process.env.DEPLOY_R2_BUCKET
 
 if (!DEPLOY_D1_DATABASE_ID) {
   throw new Error('Missing DEPLOY_D1_DATABASE_ID environment variable!')
@@ -18,6 +19,7 @@ const config = parse(source)
 if (config.d1_databases && config.d1_databases[0]) {
   config.d1_databases[0].database_id = DEPLOY_D1_DATABASE_ID
   config.d1_databases[0].database_name = DEPLOY_D1_DATABASE_NAME
+  config.r2_bucket[0].bucket_name = DEPLOY_R2_BUCKET
 }
 
 // Inject runtime variables for Cloudflare Worker
