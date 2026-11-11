@@ -13,7 +13,7 @@
     {
       "binding": "DB",
       "database_name": "absensi",
-      "database_id": "25f3a683-c151-4d52-a297-1e2a4e02cd68",
+      "database_id": "1716fac1-24da-4624-9ca2-6124900c3524",
       "migrations_dir": "drizzle"
     }
   ],

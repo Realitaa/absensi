@@ -25,6 +25,7 @@
     "db:migrate": "wrangler d1 migrations apply DB --local",
     "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
     "db:seed": "node scripts/seed.mjs",
+    "db:seed:remote": "node scripts/seed.mjs --remote",
     "db:studio": "drizzle-kit studio",
     "deploy:config": "node scripts/deploy-config.mjs",
     "deploy": "pnpm db:migrate:remote --config wrangler.deploy.jsonc && wrangler deploy .output/server/index.mjs --assets .output/public --config wrangler.deploy.jsonc"
@@ -62,6 +63,7 @@
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
+    "unwasm": "^0.6.3",
     "vitest": "^5.1.0",
     "vue-tsc": "^3.3.13"
   },

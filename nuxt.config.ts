@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { unwasm } from 'unwasm/plugin'
+
 export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
@@ -21,7 +23,10 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-06-30',
 
   nitro: {
-      preset: 'cloudflare_module',
+    preset: 'cloudflare_module',
+    rollupConfig: {
+      plugins: [unwasm({ esmImport: true })]
+    }
   },
 
   eslint: {

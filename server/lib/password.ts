@@ -6,40 +6,42 @@
  * Argon2id parameters: version=19, memory=19456 KiB, iterations=2,
  * parallelism=1, hash length=32 bytes, salt=16 random bytes.
  *
- * Wasm is precompiled at module load with `WebAssembly.compile()`; the
- * package default (compiling embedded base64 blobs at runtime) is
- * disallowed in Cloudflare Workers.
+ * Wasm modules are imported as static modules so Cloudflare Workers can
+ * instantiate them without runtime compilation.
  */
 import { argon2id, argon2Verify, setWASMModules } from 'argon2-wasm-edge'
+// The `?module` suffix makes the bundler emit static WebAssembly modules,
+// which Cloudflare Workers can instantiate without runtime compilation.
+import argon2WASMModule from 'argon2-wasm-edge/wasm/argon2.wasm?module'
+import blake2bWASMModule from 'argon2-wasm-edge/wasm/blake2b.wasm?module'
 import argon2WasmJson from 'argon2-wasm-edge/wasm/argon2.wasm.json'
 import blake2bWasmJson from 'argon2-wasm-edge/wasm/blake2b.wasm.json'
 
-// --- Wasm precompilation (CF Workers forbids runtime compile of blobs) ---
-const _argonModule = WebAssembly.compile(
-  Uint8Array.from(atob((argon2WasmJson as { data: string }).data), c =>
-    c.charCodeAt(0)!
+function compileJsonWasm(json: { data: string }): Promise<WebAssembly.Module> {
+  return WebAssembly.compile(
+    Uint8Array.from(atob(json.data), character => character.charCodeAt(0)!)
   )
-)
-const _blakeModule = WebAssembly.compile(
-  Uint8Array.from(atob((blake2bWasmJson as { data: string }).data), c =>
-    c.charCodeAt(0)!
-  )
-)
+}
+
+const _wasmModules = Promise.all([
+  argon2WASMModule instanceof WebAssembly.Module
+    ? argon2WASMModule
+    : compileJsonWasm(argon2WasmJson as { data: string }),
+  blake2bWASMModule instanceof WebAssembly.Module
+    ? blake2bWASMModule
+    : compileJsonWasm(blake2bWasmJson as { data: string })
+])
 
 let _wasmReady = false
 
 export async function ensureWasm(): Promise<void> {
   if (_wasmReady) return
-  const [argon2WASM, blake2bWASM] = await Promise.all([
-    _argonModule,
-    _blakeModule
-  ])
+  const [argon2WASM, blake2bWASM] = await _wasmModules
   await setWASMModules({ argon2WASM, blake2bWASM })
   _wasmReady = true
 }
 
-// Precompile eagerly so first hash/verify does not pay compile cost,
-// but hashing still awaits module load through ensureWasm().
+// Initialize the module cache eagerly; hashing and verification still await it.
 void ensureWasm().catch(() => {})
 
 export const ARGON2_MEMORY_KIB = 19456
@@ -76,7 +78,9 @@ export async function verifyPassword(
   try {
     await ensureWasm()
     return await argon2Verify({ password, hash: stored })
-  } catch {
+  } catch (error) {
+    const reason = error instanceof Error ? error.name : 'unknown'
+    console.error('AUTH_PASSWORD_VERIFY_FAILED', reason)
     return false
   }
 }

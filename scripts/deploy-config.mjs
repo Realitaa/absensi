@@ -19,15 +19,22 @@ const config = parse(source)
 if (config.d1_databases && config.d1_databases[0]) {
   config.d1_databases[0].database_id = DEPLOY_D1_DATABASE_ID
   config.d1_databases[0].database_name = DEPLOY_D1_DATABASE_NAME
-  config.r2_buckets[0].bucket_name = DEPLOY_R2_BUCKET
 }
 
-// Inject runtime variables for Cloudflare Worker
-if (!config.vars) {
-  config.vars = {}
+if (DEPLOY_R2_BUCKET) {
+  config.r2_buckets = config.r2_buckets || []
+  const photosBinding = config.r2_buckets.find(
+    bucket => bucket.binding === 'PHOTOS'
+  )
+  if (photosBinding) {
+    photosBinding.bucket_name = DEPLOY_R2_BUCKET
+  } else {
+    config.r2_buckets.push({
+      binding: 'PHOTOS',
+      bucket_name: DEPLOY_R2_BUCKET
+    })
+  }
 }
-config.vars.NUXT_SESSION_PASSWORD =
-  process.env.NUXT_SESSION_PASSWORD || 'ed7d21cd8a0644b9b5c9c5b2c99ead94'
 
 await writeFile(outputPath, JSON.stringify(config, null, 2), 'utf8')
 console.log('wrangler.deploy.jsonc successfully generated!')
