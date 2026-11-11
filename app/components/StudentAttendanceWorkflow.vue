@@ -225,8 +225,20 @@ async function verifyGps() {
     await openCamera()
   } catch (error) {
     gpsValid.value = false
+    const details = getApiErrorDetails(error)
+    if (details?.policy === 'K1' || details?.policy === 'K2' || details?.policy === 'K3') {
+      gpsPolicy.value = details.policy
+    }
+    if (typeof details?.distance === 'number') gpsDistance.value = details.distance
     state.value = 'gps-failed'
-    stateMessage.value = getApiErrorMessage(error)
+    if (
+      typeof details?.accuracy === 'number' &&
+      typeof details?.radius === 'number'
+    ) {
+      stateMessage.value = `Akurasi GPS Anda ${details.accuracy.toFixed(1)} m, sedangkan radius ruangan hanya ${details.radius.toFixed(1)} m. Pindah ke area terbuka atau tunggu sinyal GPS lebih baik.`
+    } else {
+      stateMessage.value = getApiErrorMessage(error)
+    }
   }
 }
 

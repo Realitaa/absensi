@@ -82,3 +82,13 @@ export function getApiErrorMessage(err: unknown): string {
 export function getApiErrorCode(err: unknown): ErrorCode | undefined {
   return extractCode(err)
 }
+
+export function getApiErrorDetails(
+  err: unknown
+): Record<string, unknown> | undefined {
+  const details = (err as { data?: { error?: { details?: unknown } } })?.data
+    ?.error?.details
+  return details && typeof details === 'object'
+    ? (details as Record<string, unknown>)
+    : undefined
+}

@@ -148,6 +148,19 @@ describe('student attendance workflow', () => {
       now
     )
     expect(gps.policy).toBe('K2')
+    await expect(
+      verifyStudentGps(
+        db,
+        actor,
+        {
+          sessionId,
+          latitude: 0,
+          longitude: 0,
+          accuracy: 30
+        },
+        now
+      )
+    ).rejects.toMatchObject({ code: 'OUTSIDE_GEOFENCE' })
     await db
       .update(systemSettings)
       .set({ gpsValidationPolicy: 'K3' })

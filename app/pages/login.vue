@@ -46,6 +46,7 @@ async function onSubmit(
         ? route.query.redirect
         : '/dashboard'
     await navigateTo(redirect.startsWith('/') ? redirect : '/dashboard')
+    console.log("Redirected to dashboard")
   } catch (err: unknown) {
     error.value = getApiErrorMessage(err)
   } finally {

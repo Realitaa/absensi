@@ -450,7 +450,7 @@ export async function deleteOwnSession(
   if (session.lecturerId !== actor.id) throw forbidden('Access denied')
 
   const refs = await countAttendanceReferences(db, id)
-  if (refs.attendances > 0 || refs.attempts > 0) {
+  if (refs.attendances > 0) {
     throw new AppError(
       ErrorCodes.SESSION_IN_USE,
       409,
@@ -458,16 +458,9 @@ export async function deleteOwnSession(
     )
   }
 
-  // Race-safe delete: never delete a concurrently-closed session row.
+  // A session without official attendance may be deleted even when it was
+  // closed. Its rejected GPS attempts are discarded with the session.
   const ok = await deleteSessionRow(db, id)
-  if (!ok) {
-    const fresh = await findSessionById(db, id)
-    if (!fresh) throw notFound('Session not found')
-    throw new AppError(
-      ErrorCodes.SESSION_NOT_EDITABLE,
-      409,
-      'Closed sessions cannot be deleted'
-    )
-  }
+  if (!ok) throw notFound('Session not found')
   return { deleted: true, id: session.id }
 }

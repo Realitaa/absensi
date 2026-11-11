@@ -126,9 +126,13 @@ export async function updateSession(
 }
 
 export async function deleteSessionRow(db: Db, id: number): Promise<boolean> {
+  // Failed GPS checks are attempts, not official attendance. They may be
+  // removed together with an attendance-free session so the session's
+  // restrictive foreign key remains valid.
+  await db.delete(attendanceAttempts).where(eq(attendanceAttempts.sessionId, id))
   const rows = await db
     .delete(sessions)
-    .where(sql`${sessions.id} = ${id} and ${sessions.manuallyClosedAt} is null`)
+    .where(eq(sessions.id, id))
     .returning({ id: sessions.id })
   return rows.length > 0
 }

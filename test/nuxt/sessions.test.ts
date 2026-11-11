@@ -24,6 +24,8 @@ import type { ApiErrorBody } from '../../shared/error-codes'
 import { rooms } from '../../server/db/schema/rooms'
 import { sessions } from '../../server/db/schema/sessions'
 import { attendances } from '../../server/db/schema/attendances'
+import { attendanceAttempts } from '../../server/db/schema/attendance_attempts'
+import { eq } from 'drizzle-orm'
 import { sessionStatus } from '../../server/services/session.service'
 
 let sessionUserId: number | undefined
@@ -135,6 +137,7 @@ describe('lecturer session management (FR-SESSION-01..08)', () => {
   beforeEach(async () => {
     sessionUserId = undefined
     await db.delete(attendances)
+    await db.delete(attendanceAttempts)
     await db.delete(sessions)
     await db.delete(rooms)
     await clearUsers(db)
@@ -705,6 +708,33 @@ describe('lecturer session management (FR-SESSION-01..08)', () => {
     expect((result.body as { deleted: boolean }).deleted).toBe(true)
     const remaining = await db.select().from(sessions)
     expect(remaining.length).toBe(0)
+  })
+
+  it('DELETE removes a closed session with rejected attempts but no attendance', async () => {
+    const created = await createViaApi()
+    const id = (created.body as { session: { id: number } }).session.id
+    await db
+      .update(sessions)
+      .set({ manuallyClosedAt: new Date() })
+      .where(eq(sessions.id, id))
+    await db.insert(attendanceAttempts).values({
+      studentId,
+      sessionId: id,
+      roomId,
+      result: 'rejected',
+      rejectionReason: 'GPS location was outside the room',
+      attemptedAt: new Date()
+    })
+    const result = await callHandler(
+      sessionIdDelete,
+      undefined,
+      `/api/sessions/${id}`,
+      'DELETE',
+      lecturerId
+    )
+    expect(result.statusCode).toBe(200)
+    expect((await db.select().from(sessions)).length).toBe(0)
+    expect((await db.select().from(attendanceAttempts)).length).toBe(0)
   })
 
   it('DELETE rejects session with attendance (409 SESSION_IN_USE)', async () => {
