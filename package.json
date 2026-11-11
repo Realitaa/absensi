@@ -27,7 +27,7 @@
     "db:seed": "node scripts/seed.mjs",
     "db:studio": "drizzle-kit studio",
     "deploy:config": "node scripts/deploy-config.mjs",
-    "deploy": "pnpm db:migrate:remote && wrangler deploy .output/server/index.mjs --assets .output/public --config wrangler.deploy.jsonc"
+    "deploy": "pnpm db:migrate:remote --config wrangler.deploy.jsonc && wrangler deploy .output/server/index.mjs --assets .output/public --config wrangler.deploy.jsonc"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.147",

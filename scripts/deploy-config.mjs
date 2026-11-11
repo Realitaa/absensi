@@ -19,7 +19,7 @@ const config = parse(source)
 if (config.d1_databases && config.d1_databases[0]) {
   config.d1_databases[0].database_id = DEPLOY_D1_DATABASE_ID
   config.d1_databases[0].database_name = DEPLOY_D1_DATABASE_NAME
-  config.r2_bucket[0].bucket_name = DEPLOY_R2_BUCKET
+  config.r2_buckets[0].bucket_name = DEPLOY_R2_BUCKET
 }
 
 // Inject runtime variables for Cloudflare Worker
