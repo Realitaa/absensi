@@ -7,7 +7,13 @@ import { attendanceAttempts } from '../db/schema/attendance_attempts'
 
 export interface SessionWithRoom extends Session {
   roomName: string | null
-  room: { id: number; name: string } | null
+  room: {
+    id: number
+    name: string
+    latitude: number | null
+    longitude: number | null
+    radius: number | null
+  } | null
 }
 
 export async function listSessionsByLecturer(
@@ -16,7 +22,13 @@ export async function listSessionsByLecturer(
   query: { page: number; pageSize: number }
 ): Promise<{ rows: SessionWithRoom[]; total: number }> {
   const rows = await db
-    .select({ session: sessions, roomName: rooms.name })
+    .select({
+      session: sessions,
+      roomName: rooms.name,
+      roomLatitude: rooms.latitude,
+      roomLongitude: rooms.longitude,
+      roomRadius: rooms.radius
+    })
     .from(sessions)
     .leftJoin(rooms, eq(sessions.roomId, rooms.id))
     .where(eq(sessions.lecturerId, lecturerId))
@@ -32,7 +44,15 @@ export async function listSessionsByLecturer(
       ...r.session,
       roomName: r.roomName,
       room:
-        r.roomName !== null ? { id: r.session.roomId, name: r.roomName } : null
+        r.roomName !== null
+          ? {
+              id: r.session.roomId,
+              name: r.roomName,
+              latitude: r.roomLatitude,
+              longitude: r.roomLongitude,
+              radius: r.roomRadius
+            }
+          : null
     })),
     total: countRow?.count ?? 0
   }
@@ -55,7 +75,13 @@ export async function findSessionWithRoomById(
   id: number
 ): Promise<SessionWithRoom | null> {
   const rows = await db
-    .select({ session: sessions, roomName: rooms.name })
+    .select({
+      session: sessions,
+      roomName: rooms.name,
+      roomLatitude: rooms.latitude,
+      roomLongitude: rooms.longitude,
+      roomRadius: rooms.radius
+    })
     .from(sessions)
     .leftJoin(rooms, eq(sessions.roomId, rooms.id))
     .where(eq(sessions.id, id))
@@ -67,7 +93,13 @@ export async function findSessionWithRoomById(
     roomName: row.roomName,
     room:
       row.roomName !== null
-        ? { id: row.session.roomId, name: row.roomName }
+        ? {
+            id: row.session.roomId,
+            name: row.roomName,
+            latitude: row.roomLatitude,
+            longitude: row.roomLongitude,
+            radius: row.roomRadius
+          }
         : null
   }
 }

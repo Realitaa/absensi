@@ -20,6 +20,7 @@ import {
 import { ErrorCodes } from '../../shared/error-codes'
 import { getAppTimezone, parseInstant } from '../../shared/utils/timezone'
 import type { AuthenticatedUser } from './auth.service'
+import { listAttendancesBySession } from '../repositories/session-attendance.repository'
 
 /**
  * Business rules (SRS §4, §10.3):
@@ -38,7 +39,13 @@ export interface SessionDto {
   lecturerId: number
   roomId: number
   roomName: string | null
-  room: { id: number; name: string } | null
+  room: {
+    id: number
+    name: string
+    latitude?: number | null
+    longitude?: number | null
+    radius?: number | null
+  } | null
   name: string
   description: string | null
   startsAt: string
@@ -298,6 +305,29 @@ export async function listOwnSessions(
     total,
     totalPages: Math.max(1, Math.ceil(total / pageSize))
   }
+}
+
+export async function listOwnSessionAttendances(
+  db: Db,
+  actor: AuthenticatedUser,
+  id: number
+) {
+  await getOwnSession(db, actor, id)
+  const rows = await listAttendancesBySession(db, id)
+  return rows.map(row => ({
+    id: row.id,
+    studentId: row.studentId,
+    studentName: row.studentName,
+    nim: row.nim,
+    status: row.status,
+    attendanceTimestamp: row.attendanceTimestamp.toISOString(),
+    latitude: row.latitude,
+    longitude: row.longitude,
+    accuracy: row.accuracy,
+    calculatedDistance: row.calculatedDistance,
+    validationPolicy: row.validationPolicy,
+    photoPath: row.photoPath
+  }))
 }
 
 export async function getOwnSession(

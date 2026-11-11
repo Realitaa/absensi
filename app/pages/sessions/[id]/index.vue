@@ -6,7 +6,13 @@ interface Session {
   lecturerId: number
   roomId: number
   roomName: string | null
-  room: { id: number; name: string } | null
+  room: {
+    id: number
+    name: string
+    latitude?: number | null
+    longitude?: number | null
+    radius?: number | null
+  } | null
   name: string
   description: string | null
   startsAt: string
@@ -18,11 +24,24 @@ interface Session {
   updatedAt: string
 }
 
+interface Attendance {
+  id: number
+  studentName: string
+  nim: string | null
+  status: string
+  attendanceTimestamp: string
+  accuracy: number | null
+  calculatedDistance: number | null
+  validationPolicy: string
+}
+
 const route = useRoute()
 const toast = useToast()
 const sessionId = Number(route.params.id)
 const session = ref<Session | null>(null)
+const attendances = ref<Attendance[]>([])
 const loading = ref(true)
+const attendanceLoading = ref(true)
 const loadError = ref<string | null>(null)
 const actionLoading = ref(false)
 const showDelete = ref(false)
@@ -52,12 +71,19 @@ async function load() {
   loading.value = true
   loadError.value = null
   try {
-    const res = await $fetch<{ session: Session }>(`/api/sessions/${sessionId}`)
-    session.value = res.session
+    const [sessionRes, attendanceRes] = await Promise.all([
+      $fetch<{ session: Session }>(`/api/sessions/${sessionId}`),
+      $fetch<{ attendances: Attendance[] }>(
+        `/api/sessions/${sessionId}/attendances`
+      )
+    ])
+    session.value = sessionRes.session
+    attendances.value = attendanceRes.attendances
   } catch (err: unknown) {
     loadError.value = getApiErrorMessage(err)
   } finally {
     loading.value = false
+    attendanceLoading.value = false
   }
 }
 
@@ -133,39 +159,83 @@ async function onDelete() {
       <p class="text-sm text-muted">Memuat…</p>
     </UCard>
 
-    <div v-else-if="session" class="space-y-4">
-      <UCard>
-        <div class="space-y-2">
-          <div class="flex items-center gap-2">
-            <h2 class="text-lg font-semibold">{{ session.name }}</h2>
-            <UBadge :color="statusColor(session.status)" variant="soft">
-              {{ statusLabel(session.status) }}
-            </UBadge>
-          </div>
-          <p v-if="session.description" class="text-sm">
-            {{ session.description }}
-          </p>
-          <p v-else class="text-sm text-muted">Tidak ada deskripsi.</p>
+    <div v-else-if="session" class="space-y-6">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div class="order-2 md:order-1">
+          <UCard class="h-full">
+            <div class="space-y-4">
+              <div class="flex items-center gap-2">
+                <h2 class="text-lg font-semibold">{{ session.name }}</h2>
+                <UBadge :color="statusColor(session.status)" variant="soft">
+                  {{ statusLabel(session.status) }}
+                </UBadge>
+              </div>
+              <p v-if="session.description" class="text-sm">
+                {{ session.description }}
+              </p>
+              <p v-else class="text-sm text-muted">Tidak ada deskripsi.</p>
+              <dl class="grid grid-cols-[180px_1fr] gap-y-2 text-sm">
+                <dt class="text-muted">Ruangan</dt>
+                <dd>{{ session.roomName ?? '-' }}</dd>
+                <dt class="text-muted">Waktu mulai</dt>
+                <dd>{{ formatDateIndonesia(session.startsAt) }}</dd>
+                <dt class="text-muted">Batas keterlambatan</dt>
+                <dd>{{ formatDateIndonesia(session.lateThresholdAt) }}</dd>
+                <dt class="text-muted">Waktu penutupan</dt>
+                <dd>{{ formatDateIndonesia(session.closesAt) }}</dd>
+                <dt class="text-muted">Ditutup manual</dt>
+                <dd>{{ formatDateIndonesia(session.manuallyClosedAt) }}</dd>
+                <dt class="text-muted">Dibuat</dt>
+                <dd>{{ formatDateIndonesia(session.createdAt) }}</dd>
+                <dt class="text-muted">Diperbarui</dt>
+                <dd>{{ formatDateIndonesia(session.updatedAt) }}</dd>
+              </dl>
+            </div>
+          </UCard>
         </div>
-      </UCard>
-      <UCard>
-        <dl class="grid grid-cols-[180px_1fr] gap-y-1 text-sm">
-          <dt class="text-muted">Ruangan</dt>
-          <dd>{{ session.roomName ?? '-' }}</dd>
-          <dt class="text-muted">Waktu mulai</dt>
-          <dd>{{ formatDateIndonesia(session.startsAt) }}</dd>
-          <dt class="text-muted">Batas keterlambatan</dt>
-          <dd>{{ formatDateIndonesia(session.lateThresholdAt) }}</dd>
-          <dt class="text-muted">Waktu penutupan</dt>
-          <dd>{{ formatDateIndonesia(session.closesAt) }}</dd>
-          <dt class="text-muted">Ditutup manual</dt>
-          <dd>{{ formatDateIndonesia(session.manuallyClosedAt) }}</dd>
-          <dt class="text-muted">Dibuat</dt>
-          <dd>{{ formatDateIndonesia(session.createdAt) }}</dd>
-          <dt class="text-muted">Diperbarui</dt>
-          <dd>{{ formatDateIndonesia(session.updatedAt) }}</dd>
-        </dl>
-      </UCard>
+        <div
+          class="order-1 min-h-[320px] overflow-hidden rounded-lg border border-default bg-muted/20 md:order-2 md:min-h-[600px]"
+        >
+          <div
+            v-if="
+              session.room?.latitude !== undefined &&
+              session.room.latitude !== null &&
+              session.room.longitude !== undefined &&
+              session.room.longitude !== null &&
+              session.room.radius !== undefined &&
+              session.room.radius !== null
+            "
+            class="flex h-full flex-col"
+          >
+            <div class="px-4 pt-4 pb-2">
+              <p class="font-medium">{{ session.room.name }}</p>
+              <p class="text-xs text-muted">
+                Visualisasi lokasi dan radius geofence
+              </p>
+            </div>
+            <div class="min-h-0 flex-1 px-4 pb-4">
+              <RoomMap
+                :latitude="session.room.latitude"
+                :longitude="session.room.longitude"
+                :radius="session.room.radius"
+                :interactive="false"
+                height="100%"
+                class="h-full min-h-[280px]"
+              />
+            </div>
+            <p class="px-4 pb-4 text-xs text-muted">
+              Peta hanya untuk visualisasi dan tidak dapat diubah dari halaman
+              detail.
+            </p>
+          </div>
+          <div
+            v-else
+            class="flex h-full min-h-[320px] items-center justify-center p-6 text-center text-sm text-muted md:min-h-[600px]"
+          >
+            Data lokasi ruangan tidak tersedia.
+          </div>
+        </div>
+      </div>
       <div class="flex flex-wrap justify-end gap-2">
         <UButton
           label="Ubah sesi"
@@ -188,6 +258,79 @@ async function onDelete() {
           @click="showDelete = true"
         />
       </div>
+
+      <UCard>
+        <template #header>
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <h2 class="font-semibold">Mahasiswa yang sudah absensi</h2>
+              <p class="text-sm text-muted">
+                {{ attendances.length }} mahasiswa tercatat pada sesi ini.
+              </p>
+            </div>
+            <UBadge color="neutral" variant="soft">{{
+              attendances.length
+            }}</UBadge>
+          </div>
+        </template>
+        <UTable
+          :data="attendances"
+          :loading="attendanceLoading"
+          :columns="[
+            { accessorKey: 'studentName', header: 'Mahasiswa' },
+            { accessorKey: 'nim', header: 'NIM' },
+            { accessorKey: 'status', header: 'Status' },
+            { accessorKey: 'attendanceTimestamp', header: 'Waktu' },
+            { accessorKey: 'accuracy', header: 'Akurasi GPS' },
+            { accessorKey: 'calculatedDistance', header: 'Jarak' }
+          ]"
+        >
+          <template #empty>
+            <p class="py-6 text-center text-sm text-muted">
+              Belum ada mahasiswa yang melakukan absensi.
+            </p>
+          </template>
+          <template #studentName-cell="{ row }">
+            <div>
+              <p class="font-medium">{{ row.original.studentName }}</p>
+              <p class="text-xs text-muted">{{ row.original.nim ?? '-' }}</p>
+            </div>
+          </template>
+          <template #nim-cell="{ row }">{{ row.original.nim ?? '-' }}</template>
+          <template #status-cell="{ row }">
+            <UBadge
+              :color="
+                row.original.status === 'present'
+                  ? 'success'
+                  : row.original.status === 'late'
+                    ? 'warning'
+                    : 'neutral'
+              "
+              variant="soft"
+              >{{
+                row.original.status === 'present'
+                  ? 'Hadir'
+                  : row.original.status === 'late'
+                    ? 'Terlambat'
+                    : row.original.status
+              }}</UBadge
+            >
+          </template>
+          <template #attendanceTimestamp-cell="{ row }">{{
+            formatDateIndonesia(row.original.attendanceTimestamp)
+          }}</template>
+          <template #accuracy-cell="{ row }">{{
+            row.original.accuracy === null
+              ? '-'
+              : `${row.original.accuracy.toFixed(1)} m`
+          }}</template>
+          <template #calculatedDistance-cell="{ row }">{{
+            row.original.calculatedDistance === null
+              ? '-'
+              : `${row.original.calculatedDistance.toFixed(1)} m`
+          }}</template>
+        </UTable>
+      </UCard>
     </div>
 
     <UModal

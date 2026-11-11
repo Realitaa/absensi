@@ -42,6 +42,10 @@ const form = reactive({
   closesLocal: ''
 })
 
+const selectedRoom = computed(
+  () => rooms.value.find(room => String(room.id) === form.roomId) ?? null
+)
+
 onMounted(async () => {
   try {
     const [sessionRes, roomsRes] = await Promise.all([
@@ -117,17 +121,62 @@ async function onSubmit() {
     <UCard v-else-if="!loaded">
       <p class="text-sm text-muted">Memuat…</p>
     </UCard>
-    <UCard v-else>
-      <SessionForm
-        v-model="form"
-        :rooms="rooms"
-        :rooms-loading="roomsLoading"
-        :error-message="errorMessage"
-        :loading="loading"
-        submit-label="Simpan perubahan"
-        @submit="onSubmit"
-        @cancel="router.push(`/sessions/${sessionId}`)"
-      />
-    </UCard>
+    <div v-else class="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div class="order-2 md:order-1">
+        <UCard>
+          <SessionForm
+            v-model="form"
+            :rooms="rooms"
+            :rooms-loading="roomsLoading"
+            :error-message="errorMessage"
+            :loading="loading"
+            submit-label="Simpan perubahan"
+            @submit="onSubmit"
+            @cancel="router.push(`/sessions/${sessionId}`)"
+          />
+        </UCard>
+      </div>
+      <div
+        class="order-1 min-h-[320px] overflow-hidden rounded-lg border border-default bg-muted/20 md:order-2 md:min-h-[600px]"
+      >
+        <div v-if="selectedRoom" class="flex h-full flex-col">
+          <div class="flex items-center justify-between gap-3 px-4 pt-4 pb-2">
+            <div>
+              <p class="font-medium">{{ selectedRoom.name }}</p>
+              <p class="text-xs text-muted">
+                Radius geofence: {{ selectedRoom.radius }} meter
+              </p>
+            </div>
+            <UBadge color="neutral" variant="soft" class="shrink-0"
+              >{{ selectedRoom.latitude.toFixed(4) }},
+              {{ selectedRoom.longitude.toFixed(4) }}</UBadge
+            >
+          </div>
+          <div class="min-h-0 flex-1 px-4 pb-4">
+            <RoomMap
+              :latitude="selectedRoom.latitude"
+              :longitude="selectedRoom.longitude"
+              :radius="selectedRoom.radius"
+              :interactive="false"
+              height="100%"
+              class="h-full min-h-[280px]"
+            />
+          </div>
+          <p class="px-4 pb-4 text-xs text-muted">
+            Lokasi ruangan hanya untuk visualisasi. Peta mengikuti ruangan yang
+            dipilih pada formulir.
+          </p>
+        </div>
+        <div
+          v-else
+          class="flex h-full min-h-[320px] flex-col items-center justify-center gap-2 p-6 text-center md:min-h-[600px]"
+        >
+          <UIcon name="i-lucide-map-pin" class="size-8 text-muted" />
+          <p class="text-sm text-muted">
+            Pilih ruangan untuk melihat lokasi kelas.
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
