@@ -31,8 +31,22 @@ try {
     process.exitCode = 1
   } else {
     const { seedDatabase } = await import('../server/db/seed.ts')
-    await seedDatabase(d1)
-    console.log(`${remote ? 'Remote' : 'Local'} seed complete.`)
+    try {
+      await seedDatabase(d1)
+      console.log(`${remote ? 'Remote' : 'Local'} seed complete.`)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      if (message.includes('no such table')) {
+        console.error(
+          'Seed failed: the target database has no tables yet.\n' +
+            `Run ${remote ? '`pnpm db:migrate:remote`' : '`pnpm db:migrate`'} ` +
+            'before seeding.'
+        )
+        process.exitCode = 1
+      } else {
+        throw error
+      }
+    }
   }
 } finally {
   await dispose()

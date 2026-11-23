@@ -10,10 +10,6 @@
  * instantiate them without runtime compilation.
  */
 import { argon2id, argon2Verify, setWASMModules } from 'argon2-wasm-edge'
-// The `?module` suffix makes the bundler emit static WebAssembly modules,
-// which Cloudflare Workers can instantiate without runtime compilation.
-import argon2WASMModule from 'argon2-wasm-edge/wasm/argon2.wasm?module'
-import blake2bWASMModule from 'argon2-wasm-edge/wasm/blake2b.wasm?module'
 import argon2WasmJson from 'argon2-wasm-edge/wasm/argon2.wasm.json'
 import blake2bWasmJson from 'argon2-wasm-edge/wasm/blake2b.wasm.json'
 
@@ -23,20 +19,73 @@ function compileJsonWasm(json: { data: string }): Promise<WebAssembly.Module> {
   )
 }
 
-const _wasmModules = Promise.all([
-  argon2WASMModule instanceof WebAssembly.Module
-    ? argon2WASMModule
-    : compileJsonWasm(argon2WasmJson as { data: string }),
-  blake2bWASMModule instanceof WebAssembly.Module
-    ? blake2bWASMModule
-    : compileJsonWasm(blake2bWasmJson as { data: string })
-])
+/**
+ * Static WebAssembly modules are produced by the Nitro `unwasm` plugin for the
+ * Cloudflare Worker bundle. Plain Node (seed scripts, tests) cannot consume the
+ * `?module` suffix the same way, so these imports stay dynamic and fall back to
+ * compiling the embedded JSON binaries when no module is returned.
+ *
+ * The specifiers must stay literal so the bundler can resolve them.
+ */
+async function toWebAssemblyModule(
+  loaded: unknown
+): Promise<WebAssembly.Module | null> {
+  const candidate =
+    loaded && typeof loaded === 'object' && 'default' in loaded
+      ? (loaded as { default: unknown }).default
+      : loaded
+  return candidate instanceof WebAssembly.Module ? candidate : null
+}
+
+async function importArgon2Wasm(): Promise<WebAssembly.Module | null> {
+  try {
+    return await toWebAssemblyModule(
+      await import('argon2-wasm-edge/wasm/argon2.wasm?module')
+    )
+  } catch {
+    return null
+  }
+}
+
+async function importBlake2bWasm(): Promise<WebAssembly.Module | null> {
+  try {
+    return await toWebAssemblyModule(
+      await import('argon2-wasm-edge/wasm/blake2b.wasm?module')
+    )
+  } catch {
+    return null
+  }
+}
 
 let _wasmReady = false
+let _wasmModules: Promise<{
+  argon2WASM: WebAssembly.Module
+  blake2bWASM: WebAssembly.Module
+}> | null = null
+
+function getWasmModules() {
+  if (!_wasmModules) {
+    _wasmModules = (async () => {
+      const [argon2Static, blake2bStatic] = await Promise.all([
+        importArgon2Wasm(),
+        importBlake2bWasm()
+      ])
+      return {
+        argon2WASM:
+          argon2Static ??
+          (await compileJsonWasm(argon2WasmJson as { data: string })),
+        blake2bWASM:
+          blake2bStatic ??
+          (await compileJsonWasm(blake2bWasmJson as { data: string }))
+      }
+    })()
+  }
+  return _wasmModules
+}
 
 export async function ensureWasm(): Promise<void> {
   if (_wasmReady) return
-  const [argon2WASM, blake2bWASM] = await _wasmModules
+  const { argon2WASM, blake2bWASM } = await getWasmModules()
   await setWASMModules({ argon2WASM, blake2bWASM })
   _wasmReady = true
 }
