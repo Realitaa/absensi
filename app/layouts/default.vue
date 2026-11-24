@@ -14,6 +14,15 @@ const roleLabels: Record<string, string> = {
 const items: NavigationMenuItem[][] = [
   [
     { label: 'Dasbor', icon: 'i-lucide-layout-dashboard', to: '/dashboard' },
+    ...(user.value?.role === 'student'
+      ? [
+          {
+            label: 'Riwayat Absensi',
+            icon: 'i-lucide-history',
+            to: '/attendance/history'
+          } as NavigationMenuItem
+        ]
+      : []),
     ...(user.value?.role === 'lecturer'
       ? [
           {

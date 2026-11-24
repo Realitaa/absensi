@@ -51,6 +51,7 @@ export default defineConfig({
             'test/nuxt/timezone.test.ts',
             'test/nuxt/selfie-upload.test.ts',
             'test/nuxt/student-attendance.test.ts',
+            'test/nuxt/attendance-history.test.ts',
             'test/nuxt/gps-settings.test.ts'
           ],
           environment: 'node',

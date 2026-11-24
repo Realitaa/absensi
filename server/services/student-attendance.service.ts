@@ -22,6 +22,7 @@ import {
   findPendingOwnedPhoto,
   findStudentSession,
   insertGpsAttempt,
+  listAttendanceHistoryByStudent,
   listOpenStudentSessions
 } from '../repositories/student-attendance.repository'
 import { isSafePhotoPath, type PhotoStorage } from '../utils/storage'
@@ -71,6 +72,22 @@ export async function listEligibleStudentSessions(db: Db, now = new Date()) {
       }
     }))
   }
+}
+
+export async function listOwnAttendanceHistory(
+  db: Db,
+  actor: AuthenticatedUser
+) {
+  const rows = await listAttendanceHistoryByStudent(db, actor.id)
+  return rows.map(row => ({
+    id: row.id,
+    sessionId: row.sessionId,
+    sessionName: row.sessionName,
+    roomName: row.roomName,
+    lecturerName: row.lecturerName,
+    status: row.status,
+    attendanceTimestamp: row.attendanceTimestamp.toISOString()
+  }))
 }
 
 async function getEligibleSession(db: Db, sessionId: number, now: Date) {

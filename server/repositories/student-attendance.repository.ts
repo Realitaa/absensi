@@ -1,4 +1,4 @@
-import { and, asc, eq, gt, lte, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, gt, lte, sql } from 'drizzle-orm'
 import type { Db } from '../db/index'
 import { attendanceAttempts } from '../db/schema/attendance_attempts'
 import { attendances } from '../db/schema/attendances'
@@ -36,6 +36,28 @@ export async function listOpenStudentSessions(db: Db, now: Date) {
       )
     )
     .orderBy(asc(sessions.startsAt), asc(sessions.id))
+}
+
+export async function listAttendanceHistoryByStudent(
+  db: Db,
+  studentId: number
+) {
+  return await db
+    .select({
+      id: attendances.id,
+      sessionId: sessions.id,
+      sessionName: sessions.name,
+      roomName: rooms.name,
+      lecturerName: users.name,
+      status: attendances.status,
+      attendanceTimestamp: attendances.attendanceTimestamp
+    })
+    .from(attendances)
+    .innerJoin(sessions, eq(attendances.sessionId, sessions.id))
+    .innerJoin(rooms, eq(sessions.roomId, rooms.id))
+    .innerJoin(users, eq(sessions.lecturerId, users.id))
+    .where(eq(attendances.studentId, studentId))
+    .orderBy(desc(attendances.attendanceTimestamp), desc(attendances.id))
 }
 
 export async function findStudentSession(db: Db, sessionId: number) {
