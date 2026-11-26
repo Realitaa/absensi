@@ -43,6 +43,7 @@ export default defineConfig({
           name: 'server',
           include: [
             'test/nuxt/auth-login.test.ts',
+            'test/nuxt/registration.test.ts',
             'test/nuxt/db.test.ts',
             'test/nuxt/profile.test.ts',
             'test/nuxt/user-management.test.ts',

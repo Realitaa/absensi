@@ -4,8 +4,10 @@ import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
 definePageMeta({ layout: false })
 
 const { fetch } = useUserSession()
+const route = useRoute()
 const loading = ref(false)
 const error = ref<string | null>(null)
+const justRegistered = computed(() => route.query.registered === '1')
 
 const fields: AuthFormField[] = [
   {
@@ -40,13 +42,12 @@ async function onSubmit(
       }
     })
     await fetch()
-    const route = useRoute()
     const redirect =
       typeof route.query.redirect === 'string'
         ? route.query.redirect
         : '/dashboard'
     await navigateTo(redirect.startsWith('/') ? redirect : '/dashboard')
-    console.log("Redirected to dashboard")
+    console.log('Redirected to dashboard')
   } catch (err: unknown) {
     error.value = getApiErrorMessage(err)
   } finally {
@@ -69,6 +70,13 @@ async function onSubmit(
       >
         <template #validation>
           <UAlert
+            v-if="justRegistered"
+            color="success"
+            variant="soft"
+            description="Pendaftaran berhasil. Silakan masuk."
+            class="mb-4"
+          />
+          <UAlert
             v-if="error"
             color="error"
             variant="soft"
@@ -77,6 +85,14 @@ async function onSubmit(
           />
         </template>
       </UAuthForm>
+      <template #footer>
+        <p class="text-center text-sm text-muted">
+          Belum punya akun?
+          <ULink to="/register" class="font-medium text-primary">
+            Daftar di sini
+          </ULink>
+        </p>
+      </template>
     </UCard>
   </UMain>
 </template>

@@ -21,6 +21,10 @@ const ErrorCodes = {
   OUTSIDE_GEOFENCE: 'OUTSIDE_GEOFENCE',
   DUPLICATE_ATTENDANCE: 'DUPLICATE_ATTENDANCE',
   INVALID_SESSION_WINDOW: 'INVALID_SESSION_WINDOW',
+  REGISTRATION_INVALID: 'REGISTRATION_INVALID',
+  USERNAME_TAKEN: 'USERNAME_TAKEN',
+  NIM_TAKEN: 'NIM_TAKEN',
+  PASSWORD_MISMATCH: 'PASSWORD_MISMATCH',
   GPS_UNAVAILABLE: 'GPS_UNAVAILABLE',
   CAMERA_UNAVAILABLE: 'CAMERA_UNAVAILABLE',
   CAPTURE_MISMATCH: 'CAPTURE_MISMATCH',
@@ -55,6 +59,11 @@ const MESSAGE_MAP: Partial<Record<ErrorCode, string>> = {
   [ErrorCodes.DUPLICATE_ATTENDANCE]:
     'Anda sudah mengisi absensi untuk sesi ini.',
   [ErrorCodes.INVALID_SESSION_WINDOW]: 'Waktu sesi tidak valid.',
+  [ErrorCodes.REGISTRATION_INVALID]:
+    'Data pendaftaran tidak valid. Periksa kembali isian Anda.',
+  [ErrorCodes.USERNAME_TAKEN]: 'Nama pengguna sudah digunakan.',
+  [ErrorCodes.NIM_TAKEN]: 'NIM sudah terdaftar.',
+  [ErrorCodes.PASSWORD_MISMATCH]: 'Konfirmasi kata sandi tidak cocok.',
   [ErrorCodes.GPS_UNAVAILABLE]:
     'Lokasi GPS tidak tersedia. Periksa izin lokasi Anda.',
   [ErrorCodes.CAMERA_UNAVAILABLE]:

@@ -213,6 +213,65 @@ export async function createUser(
   return toPublicUser(created)
 }
 
+export async function registerStudent(
+  db: Db,
+  input: {
+    name?: unknown
+    username?: unknown
+    nim?: unknown
+    password?: unknown
+    confirmPassword?: unknown
+  }
+): Promise<PublicUser> {
+  const fieldErrors: Record<string, string[]> = {}
+  const name = validateName(input.name, fieldErrors)
+  const username = validateUsername(input.username, fieldErrors)
+  const nim = validateNim('student', input.nim, fieldErrors)
+  const password = validatePassword(input.password, fieldErrors)
+
+  if (typeof input.confirmPassword !== 'string' || !input.confirmPassword) {
+    fieldErrors.confirmPassword = ['Password confirmation is required']
+  }
+
+  if (Object.keys(fieldErrors).length) {
+    throw new AppError(
+      ErrorCodes.REGISTRATION_INVALID,
+      400,
+      'Registration validation failed',
+      { fieldErrors }
+    )
+  }
+  if (input.confirmPassword !== password) {
+    throw new AppError(
+      ErrorCodes.PASSWORD_MISMATCH,
+      400,
+      'Password confirmation does not match'
+    )
+  }
+
+  if (await findUserByUsername(db, username!)) {
+    throw new AppError(
+      ErrorCodes.USERNAME_TAKEN,
+      409,
+      'Username already in use'
+    )
+  }
+  if (await findUserByNim(db, nim!)) {
+    throw new AppError(ErrorCodes.NIM_TAKEN, 409, 'NIM already in use')
+  }
+
+  const hashed = await hashPassword(password!)
+  const created = await insertUserRepo(db, {
+    name: name!,
+    username: username!,
+    password: hashed,
+    role: 'student',
+    nim
+  })
+  if (!created) throw validationError('Failed to create user')
+  return toPublicUser(created)
+}
+
 export async function updateUser(
   db: Db,
   actor: AuthenticatedUser,
