@@ -16,8 +16,7 @@ export async function listAttendancesBySession(db: Db, sessionId: number) {
       longitude: attendances.longitude,
       accuracy: attendances.accuracy,
       calculatedDistance: attendances.calculatedDistance,
-      validationPolicy: attendances.validationPolicy,
-      photoPath: attendances.photoPath
+      validationPolicy: attendances.validationPolicy
     })
     .from(attendances)
     .innerJoin(users, eq(attendances.studentId, users.id))

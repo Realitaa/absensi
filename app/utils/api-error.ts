@@ -27,7 +27,6 @@ const ErrorCodes = {
   PASSWORD_MISMATCH: 'PASSWORD_MISMATCH',
   GPS_UNAVAILABLE: 'GPS_UNAVAILABLE',
   CAMERA_UNAVAILABLE: 'CAMERA_UNAVAILABLE',
-  CAPTURE_MISMATCH: 'CAPTURE_MISMATCH',
   STORAGE_ERROR: 'STORAGE_ERROR',
   INTERNAL_ERROR: 'INTERNAL_ERROR'
 } as const
@@ -68,8 +67,6 @@ const MESSAGE_MAP: Partial<Record<ErrorCode, string>> = {
     'Lokasi GPS tidak tersedia. Periksa izin lokasi Anda.',
   [ErrorCodes.CAMERA_UNAVAILABLE]:
     'Kamera tidak tersedia atau izinnya ditolak.',
-  [ErrorCodes.CAPTURE_MISMATCH]:
-    'Foto selfie tidak valid atau sudah digunakan.',
   [ErrorCodes.STORAGE_ERROR]: 'Gagal menyimpan foto. Coba lagi nanti.',
   [ErrorCodes.INTERNAL_ERROR]: FALLBACK
 }

@@ -325,8 +325,7 @@ export async function listOwnSessionAttendances(
     longitude: row.longitude,
     accuracy: row.accuracy,
     calculatedDistance: row.calculatedDistance,
-    validationPolicy: row.validationPolicy,
-    photoPath: row.photoPath
+    validationPolicy: row.validationPolicy
   }))
 }
 

@@ -41,6 +41,7 @@
     "leaflet": "^1.9.4",
     "nuxt": "^4.6.3",
     "nuxt-auth-utils": "0.6.1",
+    "nuxt-easy-lightbox": "^1.1.0",
     "tailwindcss": "^4.3.3",
     "vue": "^3.5.44",
     "wrangler": "^4.157.0"

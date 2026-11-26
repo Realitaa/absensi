@@ -7,8 +7,11 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxt/test-utils/module',
     'nuxt-auth-utils',
-    '@vueuse/nuxt/module'
+    '@vueuse/nuxt/module',
+    'nuxt-easy-lightbox'
   ],
+
+  ssr: false,
 
   devtools: {
     enabled: true

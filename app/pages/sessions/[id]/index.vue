@@ -46,6 +46,18 @@ const loadError = ref<string | null>(null)
 const actionLoading = ref(false)
 const showDelete = ref(false)
 const showClose = ref(false)
+const lightboxVisible = ref(false)
+const lightboxImages = ref<Array<{ src: string; title: string }>>([])
+
+function openAttendancePhoto(attendance: Attendance) {
+  lightboxImages.value = [
+    {
+      src: `/api/attendance/${attendance.id}/photo`,
+      title: `Bukti absensi ${attendance.studentName}`
+    }
+  ]
+  lightboxVisible.value = true
+}
 
 function statusLabel(status: string) {
   const map: Record<string, string> = {
@@ -282,7 +294,8 @@ async function onDelete() {
             { accessorKey: 'status', header: 'Status' },
             { accessorKey: 'attendanceTimestamp', header: 'Waktu' },
             { accessorKey: 'accuracy', header: 'Akurasi GPS' },
-            { accessorKey: 'calculatedDistance', header: 'Jarak' }
+            { accessorKey: 'calculatedDistance', header: 'Jarak' },
+            { id: 'photo', header: 'Bukti Foto' }
           ]"
         >
           <template #empty>
@@ -329,8 +342,22 @@ async function onDelete() {
               ? '-'
               : `${row.original.calculatedDistance.toFixed(1)} m`
           }}</template>
+          <template #photo-cell="{ row }">
+            <UButton
+              label="Lihat foto"
+              icon="i-lucide-image"
+              size="sm"
+              variant="soft"
+              @click="openAttendancePhoto(row.original)"
+            />
+          </template>
         </UTable>
       </UCard>
+      <VueEasyLightbox
+        :visible="lightboxVisible"
+        :imgs="lightboxImages"
+        @hide="lightboxVisible = false"
+      />
     </div>
 
     <UModal
